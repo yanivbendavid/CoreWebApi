@@ -22,6 +22,24 @@ namespace CoreWebApi.Controllers
             return Ok(await _dbContext.Contacts.ToListAsync());
         }
 
+        [HttpGet]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> GetContact([FromRoute]Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return NotFound();
+            }
+
+            var contact = await _dbContext.Contacts.FindAsync(id);
+            if (contact == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(contact);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddContact(AddContactRequest addContactRequest)
         {
@@ -62,6 +80,26 @@ namespace CoreWebApi.Controllers
 
             await _dbContext.SaveChangesAsync();
 
+            return Ok(contact);
+        }
+
+        [HttpDelete]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> DeleteContact([FromRoute]Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return NotFound();
+            }
+
+            var contact = await _dbContext.Contacts.FindAsync(id);
+            if (contact == null)
+            {
+                return NotFound();
+            }
+
+            _dbContext.Contacts.Remove(contact);
+            await _dbContext.SaveChangesAsync();
             return Ok(contact);
         }
     }
